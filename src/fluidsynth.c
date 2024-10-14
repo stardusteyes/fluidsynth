@@ -364,7 +364,7 @@ int main(int argc, char **argv)
         // parses a unicode command line string
         // allocates a new argv array.
         if ((NULL == (argv_w = CommandLineToArgvW(GetCommandLineW(), &argc))) || (1 > argc) ||
-            (NULL == (argv = (char **)malloc(sizeof(char *) * (size_t)(1 + argc)))))
+            (NULL == (argv = (char **)FLUID_ARRAY(char*, (1 + argc)))))
             return (result);
 
         // utf-16 to utf-8
@@ -372,7 +372,7 @@ int main(int argc, char **argv)
         {
             int buffer_size;
             if ((1 > (buffer_size = WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, NULL, 0, NULL, NULL))) ||
-                (NULL == (argv[i] = (char *)malloc((size_t)buffer_size))) ||
+                (NULL == (argv[i] = (char *)FLUID_ALLOC(buffer_size))) ||
                 (buffer_size != WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, argv[i], buffer_size, NULL, NULL)))
                 return (result);
         }
