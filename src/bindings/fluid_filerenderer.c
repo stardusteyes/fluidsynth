@@ -291,11 +291,12 @@ new_fluid_file_renderer(fluid_synth_t *synth)
 
 #ifdef _WIN32
     if (0 == lstrcmpA("-", filename))
-        dev->sndfile = sf_open(filename, SFM_WRITE, &info); // call sf_open(): output to pipe
+        dev->sndfile = sf_open(filename, SFM_WRITE, &info); // pipe open
     else
     {
         int u16_count;
         LPWSTR filename_w;
+
         dev->sndfile = NULL;
         
         // utf-8 filename to utf-16 filename_w
@@ -308,7 +309,7 @@ new_fluid_file_renderer(fluid_synth_t *synth)
             if (u16_count != MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, filename_w, u16_count))
                 fprintf(stderr, "Failed to convert UTF8 string to wide char string\n");
             else
-                dev->sndfile = sf_wchar_open(filename_w, SFM_WRITE, &info);
+                dev->sndfile = sf_wchar_open(filename_w, SFM_WRITE, &info); // file open
 
             FLUID_FREE(filename_w);
         }
