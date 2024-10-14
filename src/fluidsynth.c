@@ -371,8 +371,9 @@ int main(int argc, char **argv)
         for (i = 0; argc > i; i++)
         {
             int buffer_size;
+		
             if ((1 > (buffer_size = WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, NULL, 0, NULL, NULL))) ||
-                (NULL == (argv[i] = (char *)FLUID_ALLOC(buffer_size))) ||
+                (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size))) ||
                 (buffer_size != WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, argv[i], buffer_size, NULL, NULL)))
                 return (result);
         }
