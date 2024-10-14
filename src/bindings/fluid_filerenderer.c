@@ -296,7 +296,6 @@ new_fluid_file_renderer(fluid_synth_t *synth)
     {
         int u16_count;
         LPWSTR filename_w;
-
         dev->sndfile = NULL;
         
         // utf-8 filename to utf-16 filename_w
@@ -310,7 +309,6 @@ new_fluid_file_renderer(fluid_synth_t *synth)
                 fprintf(stderr, "Failed to convert UTF8 string to wide char string\n");
             else
                 dev->sndfile = sf_wchar_open(filename_w, SFM_WRITE, &info); // file open
-
             FLUID_FREE(filename_w);
         }
     }
