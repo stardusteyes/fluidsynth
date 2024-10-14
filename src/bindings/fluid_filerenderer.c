@@ -296,11 +296,9 @@ new_fluid_file_renderer(fluid_synth_t *synth)
     {
         int u16_count;
         LPWSTR filename_w;
-
         dev->sndfile = NULL;
         
         // utf-8 filename to utf-16 filename_w
-        // call sf_wchar_open(): output to file
         if (1 > (u16_count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, NULL, 0)))
             fprintf(stderr, "Failed to convert UTF8 string to wide char string\n");
         else if (NULL == (filename_w = (LPWSTR)FLUID_ARRAY(WCHAR, u16_count)))
