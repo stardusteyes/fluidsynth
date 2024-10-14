@@ -303,7 +303,7 @@ new_fluid_file_renderer(fluid_synth_t *synth)
         // call sf_wchar_open(): output to file
         if (1 > (u16_count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, NULL, 0)))
             fprintf(stderr, "Failed to convert UTF8 string to wide char string\n");
-        else if (NULL == (filename_w = malloc(sizeof(WCHAR) * (size_t)u16_count)))
+        else if (NULL == (filename_w = (LPWSTR)FLUID_ARRAY(WCHAR, u16_count)))
             fprintf(stderr, "Out of memory\n");
         else
         {
@@ -312,7 +312,7 @@ new_fluid_file_renderer(fluid_synth_t *synth)
             else
                 dev->sndfile = sf_wchar_open(filename_w, SFM_WRITE, &info);
 
-            free(filename_w);
+            FLUID_FREE(filename_w);
         }
     }
 #else
