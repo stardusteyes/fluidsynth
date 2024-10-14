@@ -360,28 +360,60 @@ int main(int argc, char **argv)
     // update argc and argv: utf-16 command line string to utf-8 arguments
     {
         LPWSTR *argv_w;
+        argc = 0;
+        argv = NULL;
 
-        // parses a unicode command line string
-        // allocates a new argv array.
-        if ((NULL == (argv_w = CommandLineToArgvW(GetCommandLineW(), &argc))) || (1 > argc) ||
-            (NULL == (argv = (char **)FLUID_ARRAY(char*, (1 + argc)))))
-            return (result);
-
-        // utf-16 to utf-8
-        for (i = 0; argc > i; i++)
+        // parses a unicode command line string.
+        if (NULL == (argv_w = CommandLineToArgvW(GetCommandLineW(), &argc)))
+            fprintf(stderr, "Failed to parses a unicode command line string\n");
+        else
         {
-            int buffer_size;
-		
-            if ((1 > (buffer_size = WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, NULL, 0, NULL, NULL))) ||
-                (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size))) ||
-                (buffer_size != WideCharToMultiByte(CP_UTF8, 0, argv_w[i], -1, argv[i], buffer_size, NULL, NULL)))
-                return (result);
+            if (1 > argc)
+                fprintf(stderr, "Failed to parses a unicode command line string\n");
+            else
+            {
+                // allocates a new argv array
+                if (NULL == (argv = (char **)FLUID_ARRAY(char*, (1 + argc))))
+                    fprintf(stderr, "Out of memory\n");
+                else
+                {
+                    // utf-16 to utf-8
+                    for (i = 0; argc > i; i++)
+                    {
+                        int buffer_size;
+                        argv[i] = NULL;
+
+                        if (1 > (buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_w[i], -1, NULL, 0, NULL, NULL)))
+                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
+                        else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size)))
+                            fprintf(stderr, "Out of memory\n");
+                        else if (buffer_size != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_w[i], -1, argv[i], buffer_size, NULL, NULL))
+                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
+                        else
+                            continue;
+                        break;
+                    }
+
+                    // clean up if error occured
+                    if (argc != i)
+                    {
+                        while (0 <= i)
+                        {
+                            if (NULL != argv[i])
+                                FLUID_FREE(argv[i]);
+                            i--;
+                        }
+                        FLUID_FREE(argv);
+                        argv = NULL;
+                    }
+                }
+            }
+            // release argv_w
+            LocalFree(argv_w);
         }
-
-        argv[argc] = NULL;
-
-        // release argv_w
-        LocalFree(argv_w);
+        // clean up if error occured
+        if (NULL == argv)
+            goto cleanup;
     }
 #endif
 
