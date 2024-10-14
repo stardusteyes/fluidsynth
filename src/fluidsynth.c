@@ -920,7 +920,7 @@ int main(int argc, char **argv)
 
         if(fluid_is_soundfont(argv[i]))
         {
-            if(fluid_synth_sfload(synth, u8_path, 1) == -1)
+            if(fluid_synth_sfload(synth, argv[i], 1) == -1)
             {
                 fprintf(stderr, "Failed to load the SoundFont %s\n", argv[i]);
             }
@@ -983,7 +983,7 @@ int main(int argc, char **argv)
     /* create the player and add any midi files, if requested */
     for(i = arg1; i < argc; i++)
     {
-        if((u8_path[0] != '-') && fluid_is_midifile(argv[i]))
+        if((argv[i][0] != '-') && fluid_is_midifile(argv[i]))
         {
             if(player == NULL)
             {
