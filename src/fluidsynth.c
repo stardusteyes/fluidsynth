@@ -352,68 +352,66 @@ int main(int argc, char **argv)
     static const char optchars[] = "a:C:c:dE:f:F:G:g:hijK:L:lm:nO:o:p:QqR:r:sT:Vvz:";
 
 #ifdef _WIN32
+    int argc_dup = 0;
+    char **argv_dup = NULL;
+
     // console output will be utf-8
     SetConsoleOutputCP(CP_UTF8);
     // console input, too
     SetConsoleCP(CP_UTF8);
 
-    // update argc and argv: utf-16 command line string to utf-8 arguments
+    // overwrite argc and argv: utf-16 command line string to utf-8 arguments
     {
-        LPWSTR *argv_w;
-        argc = 0;
+        LPWSTR *argv_wchar;
         argv = NULL;
 
         // parses a unicode command line string.
-        if (NULL == (argv_w = CommandLineToArgvW(GetCommandLineW(), &argc)))
-            fprintf(stderr, "Failed to parses a unicode command line string\n");
+        if (NULL == (argv_wchar = CommandLineToArgvW(GetCommandLineW(), &argc)))
+            FLUID_LOG(FLUID_ERR, "Failed to parses a unicode command line string");
         else
         {
             if (1 > argc)
-                fprintf(stderr, "Failed to parses a unicode command line string\n");
+                FLUID_LOG(FLUID_ERR, "Failed to parses a unicode command line string");
             else
             {
+                argc_dup = argc;
+
                 // allocates a new argv array
-                if (NULL == (argv = (char **)FLUID_ARRAY(char*, (1 + argc))))
-                    fprintf(stderr, "Out of memory\n");
+                if (NULL == (argv = argv_dup = (char **)FLUID_ARRAY(char *, (1 + argc))))
+                    FLUID_LOG(FLUID_PANIC, "Out of memory");
                 else
                 {
+                    // initialize a new argv array
+                    for (i = 0; argc >= i; i++)
+                        argv[i] = NULL;
+
                     // utf-16 to utf-8
                     for (i = 0; argc > i; i++)
                     {
                         int buffer_size;
-                        argv[i] = NULL;
 
-                        if (1 > (buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_w[i], -1, NULL, 0, NULL, NULL)))
-                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
+                        if (1 > (buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, NULL, 0, NULL, NULL)))
+                            FLUID_LOG(FLUID_ERR, "Failed to convert wide char string to UTF8 string");
                         else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size)))
-                            fprintf(stderr, "Out of memory\n");
-                        else if (buffer_size != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_w[i], -1, argv[i], buffer_size, NULL, NULL))
-                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
+                            FLUID_LOG(FLUID_PANIC, "Out of memory");
+                        else if (buffer_size != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], buffer_size, NULL, NULL))
+                            FLUID_LOG(FLUID_ERR, "Failed to convert wide char string to UTF8 string");
                         else
                             continue;
-                        break;
-                    }
-
-                    // clean up if error occured
-                    if (argc != i)
-                    {
-                        while (0 <= i)
-                        {
-                            if (NULL != argv[i])
-                                FLUID_FREE(argv[i]);
-                            i--;
-                        }
-                        FLUID_FREE(argv);
                         argv = NULL;
+                        break;
                     }
                 }
             }
             // release argv_w
-            LocalFree(argv_w);
+            LocalFree(argv_wchar);
         }
-        // clean up if error occured
+        // if error, message out and goto cleanup
         if (NULL == argv)
+        {
+            fprintf(stderr, "Failed to parses a unicode command line string\n");
             goto cleanup;
+        }
     }
 #endif
 
@@ -1183,6 +1181,20 @@ cleanup:
     delete_fluid_synth(synth);
     delete_fluid_settings(settings);
 
+#ifdef _WIN32
+    if (NULL != argv_dup)
+    {
+        for (i = 0; argc_dup > i; i++)
+        {
+            if (NULL != argv_dup[i])
+            {
+                FLUID_FREE(argv_dup[i]);
+            }
+        }
+        FLUID_FREE(argv_dup);
+    }
+#endif
+	    
     return result;
 }
 
