@@ -394,7 +394,7 @@ int main(int argc, char **argv)
                             fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
                         else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, u8_count)))
                             fprintf(stderr, "Out of memory\n");
-                        else if (u8_count !=WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], u8_count, NULL, NULL))
+                        else if (u8_count != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], u8_count, NULL, NULL))
                             fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
                         else
                             continue;
