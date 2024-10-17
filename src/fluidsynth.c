@@ -374,13 +374,13 @@ int main(int argc, char **argv)
                 FLUID_LOG(FLUID_ERR, "Failed to parses a unicode command line string");
             else
             {
-                argc_dup = argc;
-
                 // allocates a new argv array
                 if (NULL == (argv = argv_dup = (char **)FLUID_ARRAY(char *, (1 + argc))))
                     FLUID_LOG(FLUID_PANIC, "Out of memory");
                 else
                 {
+                    argc_dup = argc;
+
                     // initialize a new argv array
                     for (i = 0; argc >= i; i++)
                         argv[i] = NULL;
@@ -1187,9 +1187,7 @@ cleanup:
         for (i = 0; argc_dup > i; i++)
         {
             if (NULL != argv_dup[i])
-            {
                 FLUID_FREE(argv_dup[i]);
-            }
         }
         FLUID_FREE(argv_dup);
     }
