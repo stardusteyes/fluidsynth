@@ -367,11 +367,11 @@ int main(int argc, char **argv)
 
         // parses a unicode command line string.
         if (NULL == (argv_wchar = CommandLineToArgvW(GetCommandLineW(), &argc)))
-            FLUID_LOG(FLUID_ERR, "Failed to parses a unicode command line string");
+            FLUID_LOG(FLUID_PANIC, "Failed to parses a unicode command line string");
         else
         {
             if (1 > argc)
-                FLUID_LOG(FLUID_ERR, "Failed to parses a unicode command line string");
+                FLUID_LOG(FLUID_PANIC, "Failed to parses a unicode command line string");
             else
             {
                 // allocates a new argv array
@@ -391,11 +391,11 @@ int main(int argc, char **argv)
                         int buffer_size;
 
                         if (1 > (buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, NULL, 0, NULL, NULL)))
-                            FLUID_LOG(FLUID_ERR, "Failed to convert wide char string to UTF8 string");
+                            FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
                         else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size)))
                             FLUID_LOG(FLUID_PANIC, "Out of memory");
                         else if (buffer_size != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], buffer_size, NULL, NULL))
-                            FLUID_LOG(FLUID_ERR, "Failed to convert wide char string to UTF8 string");
+                            FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
                         else
                             continue;
                         argv = NULL;
