@@ -388,13 +388,13 @@ int main(int argc, char **argv)
                     // utf-16 to utf-8
                     for (i = 0; argc > i; i++)
                     {
-                        int buffer_size;
+                        int u8_count;
 
-                        if (1 > (buffer_size = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, NULL, 0, NULL, NULL)))
+                        if (1 > (u8_count = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, NULL, 0, NULL, NULL)))
                             FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
-                        else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, buffer_size)))
+                        else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, u8_count)))
                             FLUID_LOG(FLUID_PANIC, "Out of memory");
-                        else if (buffer_size != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], buffer_size, NULL, NULL))
+                        else if (u8_count != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], u8_count, NULL, NULL))
                             FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
                         else
                             continue;
