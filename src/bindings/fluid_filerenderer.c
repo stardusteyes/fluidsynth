@@ -295,21 +295,21 @@ new_fluid_file_renderer(fluid_synth_t *synth)
     else
     {
         int u16_count;
-        LPWSTR filename_w;
+        LPWSTR filename_wchar;
         dev->sndfile = NULL;
         
-        // utf-8 filename to utf-16 filename_w
+        // utf-8 filename to utf-16 filename_wchar
         if (1 > (u16_count = MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, NULL, 0)))
             FLUID_LOG(FLUID_ERR, "Failed to convert UTF8 string to wide char string");
-        else if (NULL == (filename_w = (LPWSTR)FLUID_ARRAY(WCHAR, u16_count)))
+        else if (NULL == (filename_wchar = (LPWSTR)FLUID_ARRAY(WCHAR, u16_count)))
             FLUID_LOG(FLUID_ERR, "Out of memory");
         else
         {
-            if (u16_count != MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, filename_w, u16_count))
+            if (u16_count != MultiByteToWideChar(CP_UTF8, MB_ERR_INVALID_CHARS, filename, -1, filename_wchar, u16_count))
                 FLUID_LOG(FLUID_ERR, "Failed to convert UTF8 string to wide char string");
             else
-                dev->sndfile = sf_wchar_open(filename_w, SFM_WRITE, &info); // file open
-            FLUID_FREE(filename_w);
+                dev->sndfile = sf_wchar_open(filename_wchar, SFM_WRITE, &info); // file open
+            FLUID_FREE(filename_wchar);
         }
     }
 #else
