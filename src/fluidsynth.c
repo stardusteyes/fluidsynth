@@ -367,16 +367,16 @@ int main(int argc, char **argv)
 
         // parses a unicode command line string.
         if (NULL == (argv_wchar = CommandLineToArgvW(GetCommandLineW(), &argc)))
-            FLUID_LOG(FLUID_PANIC, "Failed to parses a unicode command line string");
+            fprintf(stderr, "Failed to parses a unicode command line string\n");
         else
         {
             if (1 > argc)
-                FLUID_LOG(FLUID_PANIC, "Failed to parses a unicode command line string");
+                fprintf(stderr, "Failed to parses a unicode command line string\n");
             else
             {
                 // allocates a new argv array
                 if (NULL == (argv = argv_dup = (char **)FLUID_ARRAY(char *, (1 + argc))))
-                    FLUID_LOG(FLUID_PANIC, "Out of memory");
+                    fprintf(stderr, "Out of memory\n");
                 else
                 {
                     argc_dup = argc;
@@ -391,11 +391,11 @@ int main(int argc, char **argv)
                         int u8_count;
 
                         if (1 > (u8_count = WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, NULL, 0, NULL, NULL)))
-                            FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
+                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
                         else if (NULL == (argv[i] = (char *)FLUID_ARRAY(char, u8_count)))
-                            FLUID_LOG(FLUID_PANIC, "Out of memory");
-                        else if (u8_count != WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], u8_count, NULL, NULL))
-                            FLUID_LOG(FLUID_PANIC, "Failed to convert wide char string to UTF8 string");
+                            fprintf(stderr, "Out of memory\n");
+                        else if (u8_count !=WideCharToMultiByte(CP_UTF8, WC_ERR_INVALID_CHARS, argv_wchar[i], -1, argv[i], u8_count, NULL, NULL))
+                            fprintf(stderr, "Failed to convert wide char string to UTF8 string\n");
                         else
                             continue;
                         argv = NULL;
@@ -407,12 +407,9 @@ int main(int argc, char **argv)
             LocalFree(argv_wchar);
         }
     }
-    // if failed, message out and goto cleanup
+    // if failed, goto cleanup
     if (NULL == argv)
-    {
-        fprintf(stderr, "Failed to parses a unicode command line string\n");
         goto cleanup;
-    }
 #endif
 
 #if SDL2_SUPPORT
