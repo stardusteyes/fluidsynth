@@ -361,9 +361,9 @@ int main(int argc, char **argv)
     SetConsoleCP(CP_UTF8);
 
     // overwrite argc and argv: utf-16 command line string to utf-8 arguments
+    argv = NULL;
     {
         LPWSTR *argv_wchar;
-        argv = NULL;
 
         // parses a unicode command line string.
         if (NULL == (argv_wchar = CommandLineToArgvW(GetCommandLineW(), &argc)))
@@ -406,12 +406,12 @@ int main(int argc, char **argv)
             // release argv_w
             LocalFree(argv_wchar);
         }
-        // if error, message out and goto cleanup
-        if (NULL == argv)
-        {
-            fprintf(stderr, "Failed to parses a unicode command line string\n");
-            goto cleanup;
-        }
+    }
+    // if failed, message out and goto cleanup
+    if (NULL == argv)
+    {
+        fprintf(stderr, "Failed to parses a unicode command line string\n");
+        goto cleanup;
     }
 #endif
 
