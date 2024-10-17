@@ -326,7 +326,7 @@ fast_render_loop(fluid_settings_t *settings, fluid_synth_t *synth, fluid_player_
  */
 int main(int argc, char **argv)
 {
-    fluid_settings_t *settings;
+    fluid_settings_t *settings = NULL;
     int result = -1;
     int arg1 = 1;
     char buf[512];
